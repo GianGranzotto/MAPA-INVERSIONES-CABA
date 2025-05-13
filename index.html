@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa de Inversiones CABA</title>
+    <!-- Cargar la librería de Leaflet para el mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Cargar nuestros estilos -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Panel lateral con estadísticas y controles -->
+    <div id="sidebar">
+        <h2>Panel de Control</h2>
+        <div id="stats">
+            <h3>Estadísticas</h3>
+            <p><strong>Total Inversiones:</strong> <span id="totalInversiones">$0</span></p>
+            <p><strong>Comuna con Mayor Inversión:</strong> <span id="comunaMax">N/A</span></p>
+            <p><strong>Comuna con Menor Inversión:</strong> <span id="comunaMin">N/A</span></p>
+            <h4>Total por Rubro</h4>
+            <ul id="rubrosList"></ul>
+        </div>
+        <div id="filters">
+            <h3>Filtros</h3>
+            <select id="rubroFilter" onchange="filterByRubro()">
+                <option value="todos">Todos los rubros</option>
+            </select>
+        </div>
+        <div id="export">
+            <h3>Exportar</h3>
+            <button onclick="exportMapAsImage()">Descargar Mapa como Imagen</button>
+            <button onclick="exportDataAsCSV()">Descargar Datos como CSV</button>
+        </div>
+    </div>
+    <!-- Contenedor del mapa -->
+    <div id="map"></div>
+    <!-- Cargar librerías -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <!-- Cargar nuestro código -->
+    <script src="script.js"></script>
+</body>
+</html>
