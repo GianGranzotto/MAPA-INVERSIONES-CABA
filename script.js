@@ -127,7 +127,7 @@ function zoomToFeature(e) {
 }
 
 // Cargar datos desde el CSV
-Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQfBbnuqOnTu-7RvNDzsz02SJtxXV3K489cTMq__K0JiGCtWYCo08TPgsAEGgjsjZVT7-8piA6vbYMd/pub?gid=0&single=true&output=csv', {
+Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQfBbnuqOnTu-7RvNDzsz02SJtxXV3K489cTMq__K0JiGCtWYCo08TPgsAEGgjsjZVT7-8piA6vbYMd/pub?output=csv', {
     download: true,
     header: true,
     complete: function(results) {
