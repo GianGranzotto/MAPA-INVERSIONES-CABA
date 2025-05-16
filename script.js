@@ -34,7 +34,7 @@ let legend = L.control({ position: 'bottomright' });
 
 legend.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'legend');
-    const grades = [0, 100000, 1000000, 5000000, 10000000, 50000000, 100000000];
+    const grades = [0, 100000, 1000000, 5000000, 10000000, 50000000, 100000000, 500000000, 1000000000];
     div.innerHTML = '<strong>Inversiones (millones USD)</strong><br>';
     for (let i = 0; i < grades.length; i++) {
         div.innerHTML +=
@@ -58,14 +58,16 @@ fetch('comunas.geojson')
 
 // Definir los colores de las comunas según el monto
 function getColor(d) {
-    return d > 100000000 ? '#4B0082' :
-           d > 50000000  ? '#800026' :
-           d > 10000000  ? '#BD0026' :
-           d > 5000000   ? '#E31A1C' :
-           d > 1000000   ? '#FC4E2A' :
-           d > 100000    ? '#FD8D3C' :
-           d > 0         ? '#FEB24C' :
-                           '#FFEDA0';
+    return d > 1000000000 ? '#2F0047' :
+           d > 500000000  ? '#4B0082' :
+           d > 100000000  ? '#800026' :
+           d > 50000000   ? '#BD0026' :
+           d > 10000000   ? '#E31A1C' :
+           d > 5000000    ? '#FC4E2A' :
+           d > 1000000    ? '#FD8D3C' :
+           d > 100000     ? '#FEB24C' :
+           d > 0          ? '#FFEDA0' :
+                            '#FFEDA0';
 }
 
 // Estilo de las comunas
@@ -131,19 +133,26 @@ Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQfBbnuqOnTu-7RvNDzs
     complete: function(results) {
         datosRaw = results.data;
         results.data.forEach(row => {
-            const comuna = row.Comuna;
-            const monto = parseFloat(row['Monto Inversión']) || 0;
-            const rubro = row['Rubro/Sector'];
-            if (!inversiones[comuna]) {
-                inversiones[comuna] = { total: 0, rubros: {} };
+            const comuna = row.Comuna ? String(row.Comuna).trim() : null;
+            let monto = row['Monto Inversión'] ? String(row['Monto Inversión']).replace(/[,]/g, '') : '0';
+            monto = parseFloat(monto) || 0;
+            const rubro = row['Rubro/Sector'] ? String(row['Rubro/Sector']).trim() : 'Sin rubro';
+            if (comuna && !isNaN(monto)) {
+                if (!inversiones[comuna]) {
+                    inversiones[comuna] = { total: 0, rubros: {} };
+                }
+                inversiones[comuna].total += monto;
+                inversiones[comuna].rubros[rubro] = (inversiones[comuna].rubros[rubro] || 0) + monto;
+                rubros.add(rubro);
             }
-            inversiones[comuna].total += monto;
-            inversiones[comuna].rubros[rubro] = (inversiones[comuna].rubros[rubro] || 0) + monto;
-            rubros.add(rubro);
         });
+        console.log('Datos procesados:', inversiones);
         updateMap();
         updateSidebar();
         populateRubroFilter();
+    },
+    error: function(error) {
+        console.error('Error al cargar el CSV:', error);
     }
 });
 
