@@ -1,21 +1,25 @@
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    display: flex; /* Hace que el sidebar y el mapa se muestren lado a lado */
+    font-family: 'Merriweather', serif; /* Fuente Merriweather */
+    display: flex;
 }
 
 #sidebar {
     width: 300px;
     padding: 20px;
-    background: #f4f4f4;
-    height: 100vh; /* Ocupa toda la altura de la pantalla */
-    overflow-y: auto; /* Permite desplazarse si hay mucho contenido */
-    z-index: 1000; /* Asegura que esté sobre el mapa */
+    background: #153244ff; /* Fondo azul oscuro */
+    color: #ffffff; /* Letras blancas */
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1000;
 }
 
-#map {
-    flex: 1; /* Ocupa el resto del espacio */
-    height: 100vh; /* Ocupa toda la altura */
+#sidebar h2, #sidebar h3, #sidebar h4 {
+    color: #ffffff; /* Títulos blancos */
+}
+
+#sidebar p, #sidebar li {
+    color: #ffffff; /* Textos y listas blancos */
 }
 
 #stats, #filters, #export {
@@ -35,20 +39,26 @@ button {
     display: block;
     margin: 10px 0;
     padding: 8px;
-    background: #3388ff;
-    color: white;
+    background: #4a90e2; /* Azul claro para botones */
+    color: #ffffff;
     border: none;
     cursor: pointer;
+    font-family: 'Merriweather', serif;
 }
 
 button:hover {
-    background: #2566cc;
+    background: #357abd; /* Azul más oscuro al pasar el mouse */
+}
+
+#map {
+    flex: 1;
+    height: 100vh;
 }
 
 /* Estilo del panel de información */
 .info {
     padding: 6px 8px;
-    font: 14px/16px Arial, Helvetica, sans-serif;
+    font: 14px/16px 'Merriweather', serif; /* Merriweather */
     background: rgba(255,255,255,0.8);
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
@@ -72,6 +82,7 @@ button:hover {
     padding: 6px 8px;
     border-radius: 5px;
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    font-family: 'Merriweather', serif; /* Merriweather */
 }
 
 .legend i {
@@ -89,5 +100,5 @@ button:hover {
     border: none;
     border-radius: 3px;
     padding: 4px 8px;
-    font-size: 12px;
+    font: 12px 'Merriweather', serif; /* Merriweather */
 }
