@@ -7,9 +7,9 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // Objetos para guardar datos
-let inversiones = {}; // Guarda los montos por comuna y rubro
-let rubros = new Set(); // Lista de rubros únicos
-let datosRaw = []; // Guarda los datos originales para exportar
+let inversiones = {};
+let rubros = new Set();
+let datosRaw = [];
 
 // Crear el panel de información (esquina superior derecha)
 let info = L.control();
@@ -34,7 +34,7 @@ let legend = L.control({ position: 'bottomright' });
 
 legend.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'legend');
-    const grades = [0, 100000, 500000, 1000000, 5000000, 10000000];
+    const grades = [0, 100000, 1000000, 5000000, 10000000, 50000000, 100000000];
     div.innerHTML = '<strong>Inversiones (millones USD)</strong><br>';
     for (let i = 0; i < grades.length; i++) {
         div.innerHTML +=
@@ -58,13 +58,14 @@ fetch('comunas.geojson')
 
 // Definir los colores de las comunas según el monto
 function getColor(d) {
-    return d > 10000000 ? '#800026' :
-           d > 5000000  ? '#BD0026' :
-           d > 1000000  ? '#E31A1C' :
-           d > 500000   ? '#FC4E2A' :
-           d > 100000   ? '#FD8D3C' :
-           d > 0        ? '#FEB24C' :
-                          '#FFEDA0';
+    return d > 100000000 ? '#4B0082' :
+           d > 50000000  ? '#800026' :
+           d > 10000000  ? '#BD0026' :
+           d > 5000000   ? '#E31A1C' :
+           d > 1000000   ? '#FC4E2A' :
+           d > 100000    ? '#FD8D3C' :
+           d > 0         ? '#FEB24C' :
+                           '#FFEDA0';
 }
 
 // Estilo de las comunas
@@ -124,7 +125,7 @@ function zoomToFeature(e) {
 }
 
 // Cargar datos desde el CSV
-Papa.parse('https://docs.google.com/spreadsheets/d/18jXPqP1s4dQ-DMjxFHlp7A6Z7BRjzfL3Umr0xQTBvLc/edit?gid=0#gid=0', {
+Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQfBbnuqOnTu-7RvNDzsz02SJtxXV3K489cTMq__K0JiGCtWYCo08TPgsAEGgjsjZVT7-8piA6vbYMd/pub?gid=0&single=true&output=csv', {
     download: true,
     header: true,
     complete: function(results) {
@@ -168,7 +169,7 @@ function updateMap() {
 // Actualizar el panel lateral
 function updateSidebar() {
     const totalInversiones = Object.values(inversiones).reduce((sum, comuna) => sum + comuna.total, 0);
-    document.getElementById('totalInversiones').textContent = `$${totalInversiones.toLocaleString()}`;
+    document.getElementById('totalInversiones').textContent = `USD ${(totalInversiones / 1000000).toFixed(2)} MM`;
 
     let maxComuna = { comuna: 'N/A', total: 0 };
     let minComuna = { comuna: 'N/A', total: Infinity };
@@ -181,10 +182,10 @@ function updateSidebar() {
         }
     }
     document.getElementById('comunaMax').textContent = maxComuna.comuna !== 'N/A' 
-        ? `Comuna ${maxComuna.comuna}: $${maxComuna.total.toLocaleString()}` 
+        ? `Comuna ${maxComuna.comuna}: USD ${(maxComuna.total / 1000000).toFixed(2)} MM` 
         : 'N/A';
     document.getElementById('comunaMin').textContent = minComuna.comuna !== 'N/A' 
-        ? `Comuna ${minComuna.comuna}: $${minComuna.total.toLocaleString()}` 
+        ? `Comuna ${minComuna.comuna}: USD ${(minComuna.total / 1000000).toFixed(2)} MM` 
         : 'N/A';
 
     const rubrosList = document.getElementById('rubrosList');
@@ -197,7 +198,7 @@ function updateSidebar() {
     }
     for (const [rubro, total] of Object.entries(rubrosTotal)) {
         const li = document.createElement('li');
-        li.textContent = `${rubro}: $${total.toLocaleString()}`;
+        li.textContent = `${rubro}: USD ${(total / 1000000).toFixed(2)} MM`;
         rubrosList.appendChild(li);
     }
 }
