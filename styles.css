@@ -1,64 +1,53 @@
 body {
     margin: 0;
-    font-family: 'Merriweather', serif; /* Fuente Merriweather */
+    font-family: 'Merriweather', serif;
     display: flex;
 }
-
 #sidebar {
     width: 300px;
     padding: 20px;
-    background: #153244ff; /* Fondo azul oscuro */
-    color: #ffffff; /* Letras blancas */
+    background: #153244ff;
+    color: #ffffff;
     height: 100vh;
     overflow-y: auto;
     z-index: 1000;
 }
-
 #sidebar h2, #sidebar h3, #sidebar h4 {
-    color: #ffffff; /* Títulos blancos */
+    color: #ffffff;
 }
-
 #sidebar p, #sidebar li {
-    color: #ffffff; /* Textos y listas blancos */
+    color: #ffffff;
 }
-
 #stats, #filters, #export {
     margin-bottom: 20px;
 }
-
 #rubrosList {
     list-style: none;
     padding: 0;
 }
-
 #rubrosList li {
     margin: 5px 0;
 }
-
 button {
     display: block;
     margin: 10px 0;
     padding: 8px;
-    background: #4a90e2; /* Azul claro para botones */
+    background: #4a90e2;
     color: #ffffff;
     border: none;
     cursor: pointer;
     font-family: 'Merriweather', serif;
 }
-
 button:hover {
-    background: #357abd; /* Azul más oscuro al pasar el mouse */
+    background: #357abd;
 }
-
 #map {
     flex: 1;
     height: 100vh;
 }
-
-/* Estilo del panel de información */
 .info {
     padding: 6px 8px;
-    font: 14px/16px 'Merriweather', serif; /* Merriweather */
+    font: 14px/16px 'Merriweather', serif;
     background: rgba(255,255,255,0.8);
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
@@ -68,13 +57,10 @@ button:hover {
     z-index: 1000;
     min-width: 200px;
 }
-
 .info h4 {
     margin: 0 0 5px;
     color: #777;
 }
-
-/* Estilo de la leyenda */
 .legend {
     line-height: 18px;
     color: #555;
@@ -82,9 +68,8 @@ button:hover {
     padding: 6px 8px;
     border-radius: 5px;
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    font-family: 'Merriweather', serif; /* Merriweather */
+    font-family: 'Merriweather', serif;
 }
-
 .legend i {
     width: 18px;
     height: 18px;
@@ -92,13 +77,11 @@ button:hover {
     margin-right: 8px;
     opacity: 0.7;
 }
-
-/* Estilo de los tooltips */
 .leaflet-tooltip {
     background: rgba(0, 0, 0, 0.8);
     color: white;
     border: none;
     border-radius: 3px;
     padding: 4px 8px;
-    font: 12px 'Merriweather', serif; /* Merriweather */
+    font: 12px 'Merriweather', serif;
 }
