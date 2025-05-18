@@ -8,7 +8,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Objetos para guardar datos
 let inversiones = {};
-let rubros = new Set();
+let sectores = new Set();
 let datosRaw = [];
 
 // Crear el panel de información (esquina superior derecha)
@@ -23,8 +23,8 @@ info.onAdd = function (map) {
 info.update = function (props) {
     this._div.innerHTML = '<h4>Inversiones en CABA</h4>' + (props && inversiones[props.comuna] ?
         `<b>Comuna ${props.comuna}</b><br>Total: USD ${(inversiones[props.comuna].total / 1000000).toFixed(2)} MM<br>` +
-        Object.entries(inversiones[props.comuna].rubros)
-            .map(([rubro, monto]) => `${rubro}: USD ${(monto / 1000000).toFixed(2)} MM`)
+        Object.entries(inversiones[props.comuna].sectores)
+            .map(([sector, monto]) => `${sector}: USD ${(monto / 1000000).toFixed(2)} MM`)
             .join('<br>')
         : 'Pase el mouse sobre una comuna');
 };
@@ -96,8 +96,8 @@ function onEachFeature(feature, layer) {
         `Comuna ${feature.properties.comuna}<br>` +
         (inversiones[feature.properties.comuna] ?
             `Total: USD ${(inversiones[feature.properties.comuna].total / 1000000).toFixed(2)} MM<br>` +
-            Object.entries(inversiones[feature.properties.comuna].rubros)
-                .map(([rubro, monto]) => `${rubro}: USD ${(monto / 1000000).toFixed(2)} MM`)
+            Object.entries(inversiones[feature.properties.comuna].sectores)
+                .map(([sector, monto]) => `${sector}: USD ${(monto / 1000000).toFixed(2)} MM`)
                 .join('<br>')
             : 'Sin datos'),
         { sticky: true }
@@ -153,20 +153,20 @@ Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQfBbnuqOnTu-7RvNDzs
                     }
                 }
             }
-            const rubro = row['Rubro/Sector'] ? String(row['Rubro/Sector']).trim() : 'Sin rubro';
+            const sector = row['Rubro/Sector'] ? String(row['Rubro/Sector']).trim() : 'Sin sector';
             if (comuna && !isNaN(monto)) {
                 if (!inversiones[comuna]) {
-                    inversiones[comuna] = { total: 0, rubros: {} };
+                    inversiones[comuna] = { total: 0, sectores: {} };
                 }
                 inversiones[comuna].total += monto;
-                inversiones[comuna].rubros[rubro] = (inversiones[comuna].rubros[rubro] || 0) + monto;
-                rubros.add(rubro);
+                inversiones[comuna].sectores[sector] = (inversiones[comuna].sectores[sector] || 0) + monto;
+                sectores.add(sector);
             }
         });
         console.log('Datos procesados:', inversiones);
         updateMap();
         updateSidebar();
-        populateRubroFilter();
+        populateSectorFilter();
     },
     error: function(error) {
         console.error('Error al cargar el CSV:', error);
@@ -182,8 +182,8 @@ function updateMap() {
                 `Comuna ${layer.feature.properties.comuna}<br>` +
                 (inversiones[layer.feature.properties.comuna] ?
                     `Total: USD ${(inversiones[layer.feature.properties.comuna].total / 1000000).toFixed(2)} MM<br>` +
-                    Object.entries(inversiones[layer.feature.properties.comuna].rubros)
-                        .map(([rubro, monto]) => `${rubro}: USD ${(monto / 1000000).toFixed(2)} MM`)
+                    Object.entries(inversiones[layer.feature.properties.comuna].sectores)
+                        .map(([sector, monto]) => `${sector}: USD ${(monto / 1000000).toFixed(2)} MM`)
                         .join('<br>')
                     : 'Sin datos'),
                 { sticky: true }
@@ -214,41 +214,41 @@ function updateSidebar() {
         ? `Comuna ${minComuna.comuna}: USD ${(minComuna.total / 1000000).toFixed(2)} MM`
         : 'N/A';
 
-    const rubrosList = document.getElementById('rubrosList');
-    rubrosList.innerHTML = '';
-    const rubrosTotal = {};
+    const sectoresList = document.getElementById('rubrosList');
+    sectoresList.innerHTML = '';
+    const sectoresTotal = {};
     for (const comuna of Object.values(inversiones)) {
-        for (const [rubro, monto] of Object.entries(comuna.rubros)) {
-            rubrosTotal[rubro] = (rubrosTotal[rubro] || 0) + monto;
+        for (const [sector, monto] of Object.entries(comuna.sectores)) {
+            sectoresTotal[sector] = (sectoresTotal[sector] || 0) + monto;
         }
     }
-    for (const [rubro, total] of Object.entries(rubrosTotal)) {
+    for (const [sector, total] of Object.entries(sectoresTotal)) {
         const li = document.createElement('li');
-        li.textContent = `${rubro}: USD ${(total / 1000000).toFixed(2)} MM`;
-        rubrosList.appendChild(li);
+        li.textContent = `${sector}: USD ${(total / 1000000).toFixed(2)} MM`;
+        sectoresList.appendChild(li);
     }
 }
 
-// Llenar el filtro de rubros
-function populateRubroFilter() {
-    const select = document.getElementById('rubroFilter');
-    rubros.forEach(rubro => {
+// Llenar el filtro de sectores
+function populateSectorFilter() {
+    const select = document.getElementById('sectorFilter');
+    sectores.forEach(sector => {
         const option = document.createElement('option');
-        option.value = rubro;
-        option.textContent = rubro;
+        option.value = sector;
+        option.textContent = sector;
         select.appendChild(option);
     });
 }
 
-// Filtrar por rubro
-function filterByRubro() {
-    const selectedRubro = document.getElementById('rubroFilter').value;
+// Filtrar por sector
+function filterBySector() {
+    const selectedSector = document.getElementById('sectorFilter').value;
     map.eachLayer(layer => {
         if (layer.feature) {
             const comuna = layer.feature.properties.comuna;
-            if (selectedRubro === 'todos') {
+            if (selectedSector === 'todos') {
                 layer.setStyle({ fillOpacity: 0.7 });
-            } else if (inversiones[comuna]?.rubros[selectedRubro]) {
+            } else if (inversiones[comuna]?.sectores[selectedSector]) {
                 layer.setStyle({ fillOpacity: 0.7 });
             } else {
                 layer.setStyle({ fillOpacity: 0.1 });
