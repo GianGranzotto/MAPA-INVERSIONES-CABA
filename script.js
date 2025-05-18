@@ -22,8 +22,10 @@ info.onAdd = function (map) {
 
 info.update = function (props) {
     this._div.innerHTML = '<h4>Inversiones en CABA</h4>' + (props && inversiones[props.comuna] ?
-        `<b>Comuna ${props.comuna}</b><br>Total: $${inversiones[props.comuna].total.toLocaleString()}<br>` +
-        Object.entries(inversiones[props.comuna].rubros).map(([rubro, monto]) => `${rubro}: $${monto.toLocaleString()}`).join('<br>')
+        `<b>Comuna ${props.comuna}</b><br>Total: USD ${(inversiones[props.comuna].total / 1000000).toFixed(2)} MM<br>` +
+        Object.entries(inversiones[props.comuna].rubros)
+            .map(([rubro, monto]) => `${rubro}: USD ${(monto / 1000000).toFixed(2)} MM`)
+            .join('<br>')
         : 'Pase el mouse sobre una comuna');
 };
 
@@ -93,9 +95,9 @@ function onEachFeature(feature, layer) {
     layer.bindTooltip(
         `Comuna ${feature.properties.comuna}<br>` +
         (inversiones[feature.properties.comuna] ?
-            `Total: $${inversiones[feature.properties.comuna].total.toLocaleString()}<br>` +
+            `Total: USD ${(inversiones[feature.properties.comuna].total / 1000000).toFixed(2)} MM<br>` +
             Object.entries(inversiones[feature.properties.comuna].rubros)
-                .map(([rubro, monto]) => `${rubro}: $${monto.toLocaleString()}`)
+                .map(([rubro, monto]) => `${rubro}: USD ${(monto / 1000000).toFixed(2)} MM`)
                 .join('<br>')
             : 'Sin datos'),
         { sticky: true }
@@ -134,8 +136,23 @@ Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQfBbnuqOnTu-7RvNDzs
         datosRaw = results.data;
         results.data.forEach(row => {
             const comuna = row.Comuna ? String(row.Comuna).trim() : null;
-            let monto = row['Monto Inversión'] ? String(row['Monto Inversión']).replace(/[,]/g, '') : '0';
-            monto = parseFloat(monto) || 0;
+            let monto = 0;
+            const montoRaw = row['Monto Inversión'] ? String(row['Monto Inversión']).trim() : '0';
+            if (montoRaw) {
+                // Eliminar "USD" y extraer el número y el sufijo (MM o K)
+                const match = montoRaw.match(/^USD\s*(\d*\.?\d*)\s*(MM|K)$/i);
+                if (match) {
+                    const valor = parseFloat(match[1]); // Extraer el número (ej. 21, 500)
+                    const unidad = match[2].toUpperCase(); // Extraer MM o K
+                    if (!isNaN(valor)) {
+                        if (unidad === 'MM') {
+                            monto = valor * 1000000; // Convertir millones a dólares
+                        } else if (unidad === 'K') {
+                            monto = valor * 1000; // Convertir miles a dólares
+                        }
+                    }
+                }
+            }
             const rubro = row['Rubro/Sector'] ? String(row['Rubro/Sector']).trim() : 'Sin rubro';
             if (comuna && !isNaN(monto)) {
                 if (!inversiones[comuna]) {
@@ -164,9 +181,9 @@ function updateMap() {
             layer.bindTooltip(
                 `Comuna ${layer.feature.properties.comuna}<br>` +
                 (inversiones[layer.feature.properties.comuna] ?
-                    `Total: $${inversiones[layer.feature.properties.comuna].total.toLocaleString()}<br>` +
+                    `Total: USD ${(inversiones[layer.feature.properties.comuna].total / 1000000).toFixed(2)} MM<br>` +
                     Object.entries(inversiones[layer.feature.properties.comuna].rubros)
-                        .map(([rubro, monto]) => `${rubro}: $${monto.toLocaleString()}`)
+                        .map(([rubro, monto]) => `${rubro}: USD ${(monto / 1000000).toFixed(2)} MM`)
                         .join('<br>')
                     : 'Sin datos'),
                 { sticky: true }
@@ -190,11 +207,11 @@ function updateSidebar() {
             minComuna = { comuna, total: data.total };
         }
     }
-    document.getElementById('comunaMax').textContent = maxComuna.comuna !== 'N/A' 
-        ? `Comuna ${maxComuna.comuna}: USD ${(maxComuna.total / 1000000).toFixed(2)} MM` 
+    document.getElementById('comunaMax').textContent = maxComuna.comuna !== 'N/A'
+        ? `Comuna ${maxComuna.comuna}: USD ${(maxComuna.total / 1000000).toFixed(2)} MM`
         : 'N/A';
-    document.getElementById('comunaMin').textContent = minComuna.comuna !== 'N/A' 
-        ? `Comuna ${minComuna.comuna}: USD ${(minComuna.total / 1000000).toFixed(2)} MM` 
+    document.getElementById('comunaMin').textContent = minComuna.comuna !== 'N/A'
+        ? `Comuna ${minComuna.comuna}: USD ${(minComuna.total / 1000000).toFixed(2)} MM`
         : 'N/A';
 
     const rubrosList = document.getElementById('rubrosList');
