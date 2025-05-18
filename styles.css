@@ -18,6 +18,13 @@ body {
 #sidebar p, #sidebar li {
     color: #ffffff;
 }
+#sidebar #comunaMax, #sidebar #comunaMin {
+    font-size: 14px;
+    display: block; /* Fuerza un salto de línea */
+}
+#sidebar #rubrosList li {
+    font-size: 14px;
+}
 #stats, #filters, #export {
     margin-bottom: 20px;
 }
