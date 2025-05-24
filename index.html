@@ -15,16 +15,24 @@
     <div id="sidebar">
         <h2>Panel de Control</h2>
         <div id="stats">
-            <h3>Estadísticas</h3>
-            <p><strong>Total Inversiones:</strong> <span id="totalInversiones">USD 0.00 MM</span></p>
-            <p><strong>Comuna con Mayor Inversión:</strong> <span id="comunaMax">N/A</span></p>
-            <p><strong>Comuna con Menor Inversión:</strong> <span id="comunaMin">N/A</span></p>
-            <h4>Total por Sector</h4>
-            <ul id="rubrosList"></ul>
-        </div>
+    <h3>Estadísticas</h3>
+    <p><strong>Total Inversiones:</strong> <span id="totalInversiones">USD 0.00 MM</span></p>
+    <div id="maxMinStats">
+        <p><strong>Comuna con Mayor Inversión:</strong> <span id="comunaMax">N/A</span></p>
+        <p><strong>Comuna con Menor Inversión:</strong> <span id="comunaMin">N/A</span></p>
+    </div>
+    <h4>Total por Sector</h4>
+    <ul id="rubrosList"></ul>
+</div>
         <div id="filters">
             <h3>Filtros</h3>
-            <select id="sectorFilter" onchange="filterBySector()">
+            <select id="comunaFilter" onchange="updateBarrios()">
+                <option value="todos">Todas las comunas</option>
+            </select>
+            <select id="barrioFilter" onchange="filterData()" disabled>
+                <option value="todos">Todos los barrios</option>
+            </select>
+            <select id="sectorFilter" onchange="filterData()">
                 <option value="todos">Todos los sectores</option>
             </select>
         </div>
