@@ -15,16 +15,16 @@
     <div id="sidebar">
         <h2>Panel de Control</h2>
         <div id="stats">
-    <h3>Estadísticas</h3>
-    <p><strong>Total Inversiones:</strong> <span id="totalInversiones">USD 0.00 MM</span></p>
-    <div id="maxMinStats">
-       <p><strong>Comuna con Mayor Inversión:</strong></p>
-<p style="padding-left: 20px;"><span id="comunaMax">N/A</span></p> <p><strong>Comuna con Menor Inversión:</strong></p>
-<p style="padding-left: 20px;"><span id="comunaMin">N/A</span></p>
-</div>
-    <h4>Total por Sector</h4>
-    <ul id="rubrosList"></ul>
-</div>
+            <h3>Estadísticas</h3>
+            <p><strong>Total Inversiones:</strong> <span id="totalInversiones">USD 0.00 MM</span></p>
+            <div id="maxMinStats">
+                <p><strong>Comuna con Mayor Inversión:</strong></p>
+                <p style="padding-left: 20px;"><span id="comunaMax">N/A</span></p> <p><strong>Comuna con Menor Inversión:</strong></p>
+                <p style="padding-left: 20px;"><span id="comunaMin">N/A</span></p>
+            </div>
+            <h4>Total por Sector</h4>
+            <ul id="rubrosList"></ul>
+        </div>
         <div id="filters">
             <h3>Filtros</h3>
             <select id="comunaFilter" onchange="updateBarrios()">
@@ -36,7 +36,13 @@
             <select id="sectorFilter" onchange="filterData()">
                 <option value="todos">Todos los sectores</option>
             </select>
+            <select id="injerenciaFilter" onchange="filterData()">
+                <option value="todos">Injerencia GCBA</option>
+                <option value="SÍ">SÍ</option>
+                <option value="NO">NO</option>
+            </select>
         </div>
+        <p class="legend-text">*Inversiones relevadas</p>
         <div id="export">
             <h3>Exportar</h3>
             <button onclick="exportMapAsImage()">Descargar Mapa como Imagen</button>
