@@ -37,11 +37,8 @@ info.update = function (props) {
     const inversiones = isComunaView ? inversionesPorComuna : inversionesPorBarrio;
     const name = isComunaView ? `Comuna ${props.comuna}` : props.BARRIO;
     const selectedSector = document.getElementById('sectorFilter').value;
-    const selectedInjerencia = document.getElementById('injerenciaFilter').value;
     let total = 0;
     let sectoresText = '';
-    let injerenciaText = '';
-
     if (inversiones[props[key]]) {
         if (selectedSector === 'todos') {
             total = inversiones[props[key]].total;
@@ -53,35 +50,8 @@ info.update = function (props) {
             sectoresText = `${selectedSector}: USD ${(total / 1000000).toFixed(2)} MM`;
         }
     }
-
-    // Calcular datos de Injerencia GCBA
-    if (!isComunaView) { // Vista de barrios
-        const inversionesBarrio = datosRaw.filter(row => String(row.Barrio).trim() === props.BARRIO);
-        const injerenciaSi = inversionesBarrio.filter(row => String(row['Injerencia GCBA']).trim() === 'SÍ').length;
-        const injerenciaNo = inversionesBarrio.filter(row => String(row['Injerencia GCBA']).trim() === 'NO').length;
-        if (selectedInjerencia === 'todos') {
-            injerenciaText = `Injerencia GCBA:<br>SÍ: ${injerenciaSi}<br>NO: ${injerenciaNo}`;
-        } else {
-            const count = selectedInjerencia === 'SÍ' ? injerenciaSi : injerenciaNo;
-            injerenciaText = `Injerencia GCBA (${selectedInjerencia}): ${count}`;
-        }
-    } else { // Vista de comunas
-        const barriosComuna = comunasBarrios[props.comuna] || [];
-        const inversionesComuna = datosRaw.filter(row => barriosComuna.includes(String(row.Barrio).trim()));
-        const injerenciaSi = inversionesComuna.filter(row => String(row['Injerencia GCBA']).trim() === 'SÍ').length;
-        const injerenciaNo = inversionesComuna.filter(row => String(row['Injerencia GCBA']).trim() === 'NO').length;
-        if (selectedInjerencia === 'todos') {
-            injerenciaText = `Injerencia GCBA (barrios):<br>SÍ: ${injerenciaSi}<br>NO: ${injerenciaNo}`;
-        } else {
-            const count = selectedInjerencia === 'SÍ' ? injerenciaSi : injerenciaNo;
-            injerenciaText = `Injerencia GCBA (${selectedInjerencia}): ${count}`;
-        }
-    }
-
     this._div.innerHTML = '<h4>Inversiones en CABA</h4>' + (total > 0 ?
-        `<b>${name}</b><br>Total: USD ${(total / 1000000).toFixed(2)} MM<br>` +
-        sectoresText +
-        (injerenciaText ? `<br>${injerenciaText}` : '')
+        `<b>${name}</b><br>Total: USD ${(total / 1000000).toFixed(2)} MM<br>` + sectoresText
         : `Sin datos para ${name}`);
 };
 
@@ -174,11 +144,8 @@ function onEachFeature(feature, layer) {
     const inversiones = isComunaView ? inversionesPorComuna : inversionesPorBarrio;
     const name = isComunaView ? `Comuna ${feature.properties.comuna}` : feature.properties.BARRIO;
     const selectedSector = document.getElementById('sectorFilter').value;
-    const selectedInjerencia = document.getElementById('injerenciaFilter').value;
     let total = 0;
     let sectoresText = '';
-    let injerenciaText = '';
-
     if (inversiones[key]) {
         if (selectedSector === 'todos') {
             total = inversiones[key].total;
@@ -190,37 +157,10 @@ function onEachFeature(feature, layer) {
             sectoresText = `${selectedSector}: USD ${(total / 1000000).toFixed(2)} MM`;
         }
     }
-
-    // Calcular datos de Injerencia GCBA
-    if (!isComunaView) { // Vista de barrios
-        const inversionesBarrio = datosRaw.filter(row => String(row.Barrio).trim() === key);
-        const injerenciaSi = inversionesBarrio.filter(row => String(row['Injerencia GCBA']).trim() === 'SÍ').length;
-        const injerenciaNo = inversionesBarrio.filter(row => String(row['Injerencia GCBA']).trim() === 'NO').length;
-        if (selectedInjerencia === 'todos') {
-            injerenciaText = `Injerencia GCBA:<br>SÍ: ${injerenciaSi}<br>NO: ${injerenciaNo}`;
-        } else {
-            const count = selectedInjerencia === 'SÍ' ? injerenciaSi : injerenciaNo;
-            injerenciaText = `Injerencia GCBA (${selectedInjerencia}): ${count}`;
-        }
-    } else { // Vista de comunas
-        const barriosComuna = comunasBarrios[key] || [];
-        const inversionesComuna = datosRaw.filter(row => barriosComuna.includes(String(row.Barrio).trim()));
-        const injerenciaSi = inversionesComuna.filter(row => String(row['Injerencia GCBA']).trim() === 'SÍ').length;
-        const injerenciaNo = inversionesComuna.filter(row => String(row['Injerencia GCBA']).trim() === 'NO').length;
-        if (selectedInjerencia === 'todos') {
-            injerenciaText = `Injerencia GCBA (barrios):<br>SÍ: ${injerenciaSi}<br>NO: ${injerenciaNo}`;
-        } else {
-            const count = selectedInjerencia === 'SÍ' ? injerenciaSi : injerenciaNo;
-            injerenciaText = `Injerencia GCBA (${selectedInjerencia}): ${count}`;
-        }
-    }
-
     layer.bindTooltip(
         `${name}<br>` +
         (total > 0 ?
-            `Total: USD ${(total / 1000000).toFixed(2)} MM<br>` +
-            sectoresText +
-            (injerenciaText ? `<br>${injerenciaText}` : '')
+            `Total: USD ${(total / 1000000).toFixed(2)} MM<br>` + sectoresText
             : 'Sin datos'),
         { sticky: true }
     );
@@ -531,7 +471,7 @@ function exportMapAsImage() {
     html2canvas(document.getElementById('map')).then(canvas => {
         const link = document.createElement('a');
         link.download = 'mapa_inversiones_caba.png';
-        link.href = canvas.toDataDataURL('image/png');
+        link.href = canvas.toDataURL('image/png');
         link.click();
     });
 }
