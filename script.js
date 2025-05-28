@@ -37,8 +37,11 @@ info.update = function (props) {
     const inversiones = isComunaView ? inversionesPorComuna : inversionesPorBarrio;
     const name = isComunaView ? `Comuna ${props.comuna}` : props.BARRIO;
     const selectedSector = document.getElementById('sectorFilter').value;
+    const selectedInjerencia = document.getElementById('injerenciaFilter').value;
     let total = 0;
     let sectoresText = '';
+    let injerenciaText = '';
+
     if (inversiones[props[key]]) {
         if (selectedSector === 'todos') {
             total = inversiones[props[key]].total;
@@ -50,8 +53,35 @@ info.update = function (props) {
             sectoresText = `${selectedSector}: USD ${(total / 1000000).toFixed(2)} MM`;
         }
     }
+
+    // Calcular datos de Injerencia GCBA
+    if (!isComunaView) { // Vista de barrios
+        const inversionesBarrio = datosRaw.filter(row => String(row.Barrio).trim() === props.BARRIO);
+        const injerenciaSi = inversionesBarrio.filter(row => String(row['Injerencia GCBA']).trim() === 'SÍ').length;
+        const injerenciaNo = inversionesBarrio.filter(row => String(row['Injerencia GCBA']).trim() === 'NO').length;
+        if (selectedInjerencia === 'todos') {
+            injerenciaText = `Injerencia GCBA:<br>SÍ: ${injerenciaSi}<br>NO: ${injerenciaNo}`;
+        } else {
+            const count = selectedInjerencia === 'SÍ' ? injerenciaSi : injerenciaNo;
+            injerenciaText = `Injerencia GCBA (${selectedInjerencia}): ${count}`;
+        }
+    } else { // Vista de comunas
+        const barriosComuna = comunasBarrios[props.comuna] || [];
+        const inversionesComuna = datosRaw.filter(row => barriosComuna.includes(String(row.Barrio).trim()));
+        const injerenciaSi = inversionesComuna.filter(row => String(row['Injerencia GCBA']).trim() === 'SÍ').length;
+        const injerenciaNo = inversionesComuna.filter(row => String(row['Injerencia GCBA']).trim() === 'NO').length;
+        if (selectedInjerencia === 'todos') {
+            injerenciaText = `Injerencia GCBA (barrios):<br>SÍ: ${injerenciaSi}<br>NO: ${injerenciaNo}`;
+        } else {
+            const count = selectedInjerencia === 'SÍ' ? injerenciaSi : injerenciaNo;
+            injerenciaText = `Injerencia GCBA (${selectedInjerencia}): ${count}`;
+        }
+    }
+
     this._div.innerHTML = '<h4>Inversiones en CABA</h4>' + (total > 0 ?
-        `<b>${name}</b><br>Total: USD ${(total / 1000000).toFixed(2)} MM<br>` + sectoresText
+        `<b>${name}</b><br>Total: USD ${(total / 1000000).toFixed(2)} MM<br>` +
+        sectoresText +
+        (injerenciaText ? `<br>${injerenciaText}` : '')
         : `Sin datos para ${name}`);
 };
 
@@ -144,8 +174,11 @@ function onEachFeature(feature, layer) {
     const inversiones = isComunaView ? inversionesPorComuna : inversionesPorBarrio;
     const name = isComunaView ? `Comuna ${feature.properties.comuna}` : feature.properties.BARRIO;
     const selectedSector = document.getElementById('sectorFilter').value;
+    const selectedInjerencia = document.getElementById('injerenciaFilter').value;
     let total = 0;
     let sectoresText = '';
+    let injerenciaText = '';
+
     if (inversiones[key]) {
         if (selectedSector === 'todos') {
             total = inversiones[key].total;
@@ -157,10 +190,37 @@ function onEachFeature(feature, layer) {
             sectoresText = `${selectedSector}: USD ${(total / 1000000).toFixed(2)} MM`;
         }
     }
+
+    // Calcular datos de Injerencia GCBA
+    if (!isComunaView) { // Vista de barrios
+        const inversionesBarrio = datosRaw.filter(row => String(row.Barrio).trim() === key);
+        const injerenciaSi = inversionesBarrio.filter(row => String(row['Injerencia GCBA']).trim() === 'SÍ').length;
+        const injerenciaNo = inversionesBarrio.filter(row => String(row['Injerencia GCBA']).trim() === 'NO').length;
+        if (selectedInjerencia === 'todos') {
+            injerenciaText = `Injerencia GCBA:<br>SÍ: ${injerenciaSi}<br>NO: ${injerenciaNo}`;
+        } else {
+            const count = selectedInjerencia === 'SÍ' ? injerenciaSi : injerenciaNo;
+            injerenciaText = `Injerencia GCBA (${selectedInjerencia}): ${count}`;
+        }
+    } else { // Vista de comunas
+        const barriosComuna = comunasBarrios[key] || [];
+        const inversionesComuna = datosRaw.filter(row => barriosComuna.includes(String(row.Barrio).trim()));
+        const injerenciaSi = inversionesComuna.filter(row => String(row['Injerencia GCBA']).trim() === 'SÍ').length;
+        const injerenciaNo = inversionesComuna.filter(row => String(row['Injerencia GCBA']).trim() === 'NO').length;
+        if (selectedInjerencia === 'todos') {
+            injerenciaText = `Injerencia GCBA (barrios):<br>SÍ: ${injerenciaSi}<br>NO: ${injerenciaNo}`;
+        } else {
+            const count = selectedInjerencia === 'SÍ' ? injerenciaSi : injerenciaNo;
+            injerenciaText = `Injerencia GCBA (${selectedInjerencia}): ${count}`;
+        }
+    }
+
     layer.bindTooltip(
         `${name}<br>` +
         (total > 0 ?
-            `Total: USD ${(total / 1000000).toFixed(2)} MM<br>` + sectoresText
+            `Total: USD ${(total / 1000000).toFixed(2)} MM<br>` +
+            sectoresText +
+            (injerenciaText ? `<br>${injerenciaText}` : '')
             : 'Sin datos'),
         { sticky: true }
     );
@@ -300,6 +360,7 @@ function filterData() {
     const selectedComuna = document.getElementById('comunaFilter').value;
     const selectedBarrio = document.getElementById('barrioFilter').value;
     const selectedSector = document.getElementById('sectorFilter').value;
+    const selectedInjerencia = document.getElementById('injerenciaFilter').value;
 
     let datosFiltrados = datosRaw;
     if (selectedComuna !== 'todos') {
@@ -307,6 +368,9 @@ function filterData() {
     }
     if (selectedBarrio !== 'todos') {
         datosFiltrados = datosFiltrados.filter(row => String(row.Barrio).trim() === selectedBarrio);
+    }
+    if (selectedInjerencia !== 'todos') {
+        datosFiltrados = datosFiltrados.filter(row => String(row['Injerencia GCBA']).trim() === selectedInjerencia);
     }
 
     inversionesPorComuna = {};
@@ -413,7 +477,7 @@ function updateSidebar() {
     const isComunaView = document.getElementById('barrioFilter').value === 'todos';
     const inversiones = isComunaView ? inversionesPorComuna : inversionesPorBarrio;
     const totalInversiones = Object.values(inversiones).reduce((sum, item) => sum + item.total, 0);
-    document.getElementById('totalInversiones').textContent = `USD ${(totalInversiones / 1000000).toFixed(2)} MM (${totalInversionesCount})`;
+    document.getElementById('totalInversiones').textContent = `USD ${(totalInversiones / 1000000).toFixed(2)} MM (${totalInversionesCount}*)`;
 
     const maxMinStats = document.getElementById('maxMinStats');
     if (!isComunaView) {
@@ -431,10 +495,10 @@ function updateSidebar() {
             }
         }
         document.getElementById('comunaMax').textContent = maxItem.name !== 'N/A'
-            ? `Comuna ${maxItem.name}: USD ${(maxItem.total / 1000000).toFixed(2)} MM (${maxItem.count})`
+            ? `Comuna ${maxItem.name}: USD ${(maxItem.total / 1000000).toFixed(2)} MM (${maxItem.count}*)`
             : 'N/A';
         document.getElementById('comunaMin').textContent = minItem.name !== 'N/A'
-            ? `Comuna ${minItem.name}: USD ${(minItem.total / 1000000).toFixed(2)} MM (${minItem.count})`
+            ? `Comuna ${minItem.name}: USD ${(minItem.total / 1000000).toFixed(2)} MM (${minItem.count}*)`
             : 'N/A';
     }
 
@@ -448,7 +512,7 @@ function updateSidebar() {
     }
     for (const [sector, total] of Object.entries(sectoresTotal)) {
         const li = document.createElement('li');
-        li.textContent = `${sector}: USD ${(total / 1000000).toFixed(2)} MM (${sectoresCount[sector] || 0})`;
+        li.textContent = `${sector}: USD ${(total / 1000000).toFixed(2)} MM (${sectoresCount[sector] || 0}*)`;
         sectoresList.appendChild(li);
     }
 }
@@ -467,7 +531,7 @@ function exportMapAsImage() {
     html2canvas(document.getElementById('map')).then(canvas => {
         const link = document.createElement('a');
         link.download = 'mapa_inversiones_caba.png';
-        link.href = canvas.toDataURL('image/png');
+        link.href = canvas.toDataDataURL('image/png');
         link.click();
     });
 }
