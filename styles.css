@@ -88,3 +88,9 @@ body {
     padding: 8px;
     box-sizing: border-box;
 }
+
+.legend-text {
+    font-size: 12px;
+    color: #ffffff;
+    margin: 10px 0;
+}
